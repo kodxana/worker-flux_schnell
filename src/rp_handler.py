@@ -23,7 +23,7 @@ def run(job):
 
     # Input validation
     validated_input = validate(job_input, INPUT_SCHEMA)
-
+    
     if 'errors' in validated_input:
         return {"error": validated_input['errors']}
     validated_input = validated_input['validated_input']
@@ -36,6 +36,15 @@ def run(job):
 
     if validated_input['seed'] is None:
         validated_input['seed'] = int.from_bytes(os.urandom(2), "big")
+
+    # Ensure correct types for numeric parameters
+    validated_input['width'] = int(validated_input['width'])
+    validated_input['height'] = int(validated_input['height'])
+    validated_input['num_outputs'] = int(validated_input['num_outputs'])
+    validated_input['num_inference_steps'] = int(validated_input['num_inference_steps'])
+    validated_input['guidance_scale'] = float(validated_input['guidance_scale'])
+    if validated_input['seed'] is not None:
+        validated_input['seed'] = int(validated_input['seed'])
 
     img_paths = MODEL.predict(
         prompt=validated_input["prompt"],
